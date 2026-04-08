@@ -63,13 +63,13 @@ def load_courses():
 def load_roles():
     """Load roles from Excel. Columns: Role Name, Required Skills"""
     path = os.path.join("data", "cleaned_data", "tech_roles_dataset.xlsx")
-    return pd.read_excel(path) if os.path.exists(path) else pd.DataFrame()
+    return pd.read_excel(path , engine="openpyxl") if os.path.exists(path) else pd.DataFrame()
 
 
 def load_internships():
     """Load internships CSV. Columns: title, company, role, skills, link"""
     path = os.path.join("data", "cleaned_data", "internships.csv")
-    return pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
+    return pd.read_csv(path)  if os.path.exists(path) else pd.DataFrame()
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
