@@ -19,11 +19,6 @@ gemini_model = genai.GenerativeModel("models/gemini-flash-latest")
 
 import google.generativeai as genai
 
-# print("Available models:")
-
-# for m in genai.list_models():
-#     if "generateContent" in m.supported_generation_methods:
-#         print(m.name)
 # ─── App Setup ───────────────────────────────────────────────────────────────
 
 app = Flask(__name__)
@@ -38,7 +33,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def load_skills_data():
     """Load skills JSON — returns dict of {domain: [skill, ...]}"""
-    path = os.path.join("data", "/Users/vaidehijadhav/Desktop/UPTRAIL/data/cleaned_data/tech_skills_datasetupdated.json")
+    path = os.path.join("data", "cleaned_data", "tech_skills_datasetupdated.json")
     if os.path.exists(path):
         with open(path, "r") as f:
             return json.load(f)
@@ -59,7 +54,7 @@ def load_roles():
 
 def load_internships():
     """Load internships CSV. Columns: title, company, role, skills, link"""
-    path = os.path.join("data", "/Users/vaidehijadhav/Desktop/UPTRAIL/data/cleaned_data/internships.csv")
+    path = os.path.join("data", "cleaned_data", "internships.csv")
     return pd.read_csv(path) if os.path.exists(path) else pd.DataFrame()
 
 
