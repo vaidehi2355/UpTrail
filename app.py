@@ -27,6 +27,10 @@ else:
 app = Flask(__name__)
 app.secret_key = "uptrail_secret_key_change_in_production"
 
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE='Lax'
+)
 # Log startup for debugging
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -37,10 +41,7 @@ ALLOWED_EXTENSIONS = {"pdf" , "png", "jpg", "jpeg"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-app.config.update(
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_SAMESITE='Lax'
-)
+
 
 # ─── Data Loaders ─────────────────────────────────────────────────────────────
 
