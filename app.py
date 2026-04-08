@@ -37,6 +37,11 @@ ALLOWED_EXTENSIONS = {"pdf" , "png", "jpg", "jpeg"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE='Lax'
+)
+
 # ─── Data Loaders ─────────────────────────────────────────────────────────────
 
 def load_skills_data():
