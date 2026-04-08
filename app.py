@@ -12,7 +12,6 @@ import google.generativeai as genai
 import pdfplumber
 
 load_dotenv(dotenv_path=".env")
-print("CLIENT_ID:", os.getenv("GOOGLE_CLIENT_ID"))
 # Configure Gemini
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 gemini_model = genai.GenerativeModel("models/gemini-flash-latest")
