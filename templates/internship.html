@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}UpTrail — Internships{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/internship.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="role-tag">◈ {{ role or 'All Roles' }}</div>
+    <h1 class="page-title">Internship <span class="highlight">Opportunities</span></h1>
+    <p class="page-sub">Listings matched to your role and skill profile.</p>
+  </div>
+
+  <div class="intern-layout">
+
+    <!-- ── Left: Internship listings ──────────────────────────────────────── -->
+    <div class="listings-col">
+
+      {% if role %}
+      <div class="section-header">
+        <span class="section-title">Matched Internships</span>
+        <span class="section-count" id="countLabel">{{ internships | length }} found</span>
+      </div>
+      {% else %}
+      <div class="section-header">
+        <span class="section-title">All Internships</span>
+        <span class="section-count" id="countLabel">{{ internships | length }} found</span>
+      </div>
+      {% endif %}
+
+      <!-- Search bar -->
+      <div class="search-row">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="searchInput" class="search-input"
+                 placeholder="Search by title, company, or location..." autocomplete="off">
+        </div>
+      </div>
+
+      {% if internships %}
+        {% if role %}
+        <!-- Personalized view for selected role -->
+        <div class="intern-list">
+          {% for intern in internships %}
+          <div class="intern-card {% if loop.first %}featured{% endif %}">
+
+            {% if loop.first %}
+            <div class="featured-label">Best Match</div>
+            {% endif %}
+
+            <div class="intern-top">
+              <!-- Company logo initials -->
+              <div class="company-logo">
+                {{ (intern.company or 'Co')[:2].upper() }}
+              </div>
+              <div class="intern-info">
+                <div class="intern-title">{{ intern.title }}</div>
+                <div class="company-name">
+                  {{ intern.company or '—' }}
+                  {% if intern.location %} · {{ intern.location }}{% endif %}
+                </div>
+                <div class="intern-meta">
+                  {% if intern.duration %}
+                  <span class="meta-pill">◷ {{ intern.duration }}</span>
+                  {% endif %}
+                  {% if intern.mode %}
+                  <span class="meta-pill">⬡ {{ intern.mode }}</span>
+                  {% endif %}
+                  {% if intern.stipend %}
+                  <span class="meta-pill">₹ {{ intern.stipend }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            {% if intern.description %}
+            <div class="intern-desc">
+              {{ intern.description[:200] }}{% if intern.description | length > 200 %}…{% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Skills required -->
+            {% if intern.skills %}
+            <div class="intern-skills" data-internship-id="{{ loop.index }}">
+              {% set req_skills = intern.skills.split(',') %}
+              {% for skill in req_skills %}
+                <span class="skill-match {% if skill.strip().lower() in user_skills_lower %}yes{% else %}no{% endif %} {% if loop.index > 5 %}hidden-skill{% endif %}">
+                  {{ skill.strip() }}
+                </span>
+              {% endfor %}
+              {% if req_skills | length > 5 %}
+                <span class="skill-match more show-more-btn" data-internship-id="{{ loop.index }}">+{{ req_skills | length - 5 }} more</span>
+              {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="intern-footer">
+              <div class="match-info">
+                {% if intern.skills %}
+                  {% set req_skills_list = intern.skills.split(',') %}
+                  {% set req = req_skills_list | length %}
+                  {% set matched_count = namespace(value=0) %}
+                  {% for skill in req_skills_list %}
+                    {% if skill.strip().lower() in user_skills_lower %}
+                      {% set matched_count.value = matched_count.value + 1 %}
+                    {% endif %}
+                  {% endfor %}
+                  <strong>{{ matched_count.value }}/{{ req }} skills</strong> matched
+                {% endif %}
+              </div>
+              {% if intern.link %}
+                <a href="{{ intern.link }}" target="_blank"
+                   class="apply-btn {% if loop.first %}primary{% else %}outline{% endif %}">
+                  {% if loop.first %}Apply Now →{% else %}View Details →{% endif %}
+                </a>
+              {% else %}
+                <span class="apply-btn no-link">No link available</span>
+              {% endif %}
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <!-- All internships grouped by role -->
+        {% set grouped_internships = internships | groupby('role') %}
+        {% for role_group, intern_list in grouped_internships %}
+        <div class="role-section">
+          <h2 class="role-heading">{{ role_group or 'Other Roles' }}</h2>
+          <div class="intern-list">
+            {% for intern in intern_list %}
+            <div class="intern-card">
+              <div class="intern-top">
+                <!-- Company logo initials -->
+                <div class="company-logo">
+                  {{ (intern.company or 'Co')[:2].upper() }}
+                </div>
+                <div class="intern-info">
+                  <div class="intern-title">{{ intern.title }}</div>
+                  <div class="company-name">
+                    {{ intern.company or '—' }}
+                    {% if intern.location %} · {{ intern.location }}{% endif %}
+                  </div>
+                  <div class="intern-meta">
+                    {% if intern.duration %}
+                    <span class="meta-pill">◷ {{ intern.duration }}</span>
+                    {% endif %}
+                    {% if intern.mode %}
+                    <span class="meta-pill">⬡ {{ intern.mode }}</span>
+                    {% endif %}
+                    {% if intern.stipend %}
+                    <span class="meta-pill">₹ {{ intern.stipend }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              {% if intern.description %}
+              <div class="intern-desc">
+                {{ intern.description[:200] }}{% if intern.description | length > 200 %}…{% endif %}
+              </div>
+              {% endif %}
+
+              <!-- Skills required -->
+              {% if intern.skills %}
+              <div class="intern-skills" data-internship-id="{{ loop.index }}">
+                {% set req_skills = intern.skills.split(',') %}
+                {% for skill in req_skills %}
+                  <span class="skill-match {% if skill.strip().lower() in user_skills_lower %}yes{% else %}no{% endif %} {% if loop.index > 5 %}hidden-skill{% endif %}">
+                    {{ skill.strip() }}
+                  </span>
+                {% endfor %}
+                {% if req_skills | length > 5 %}
+                  <span class="skill-match more show-more-btn" data-internship-id="{{ loop.index }}">+{{ req_skills | length - 5 }} more</span>
+                {% endif %}
+              </div>
+              {% endif %}
+
+              <div class="intern-footer">
+                <div class="match-info">
+                  {% if intern.skills %}
+                    {% set req_skills_list = intern.skills.split(',') %}
+                    {% set req = req_skills_list | length %}
+                    {% set matched_count = namespace(value=0) %}
+                    {% for skill in req_skills_list %}
+                      {% if skill.strip().lower() in user_skills_lower %}
+                        {% set matched_count.value = matched_count.value + 1 %}
+                      {% endif %}
+                    {% endfor %}
+                    <strong>{{ matched_count.value }}/{{ req }} skills</strong> matched
+                  {% endif %}
+                </div>
+                {% if intern.link %}
+                  <a href="{{ intern.link }}" target="_blank" class="apply-btn outline">
+                    View Details →
+                  </a>
+                {% else %}
+                  <span class="apply-btn no-link">No link available</span>
+                {% endif %}
+              </div>
+
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+      {% else %}
+      <!-- Empty state -->
+      <div class="empty-state">
+        <div class="empty-icon">◎</div>
+        <div class="empty-title">No internships found yet</div>
+        <div class="empty-sub">
+          Make sure <code>data/internships.csv</code> exists with a <code>role</code> column
+          matching <strong>{{ role }}</strong>.
+        </div>
+        <a href="{{ url_for('courses') }}" class="empty-action">← Browse Courses</a>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- ── Right: Dashboard sidebar ───────────────────────────────────────── -->
+    <div class="sidebar-col">
+
+      <!-- Journey tracker -->
+      <div class="dash-card">
+        <div class="dash-title">Your Journey</div>
+        <div class="journey-steps">
+          {% for activity in activities %}
+          <div class="journey-step">
+            <div class="step-circle
+              {% if activity.done %}done
+              {% elif loop.index == (activities | selectattr('done') | list | length) + 1 %}current
+              {% else %}upcoming{% endif %}">
+              {% if activity.done %}✓{% elif loop.index == (activities | selectattr('done') | list | length) + 1 %}●{% else %}○{% endif %}
+            </div>
+            <div class="step-label
+              {% if activity.done %}done-text
+              {% elif loop.index == (activities | selectattr('done') | list | length) + 1 %}current-text
+              {% endif %}">
+              {{ activity.label }}
+            </div>
+          </div>
+          {% endfor %}
+          <!-- Always show apply step at end -->
+          <div class="journey-step">
+            <div class="step-circle upcoming">○</div>
+            <div class="step-label">Apply to internships</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats card -->
+      {% set readiness = namespace(pct=0) %}
+      <div class="dash-card">
+        <div class="dash-title">Your Stats</div>
+        <div class="mini-stats">
+          <div class="mini-stat">
+            <div class="mini-num purple">{{ user_skills | length }}</div>
+            <div class="mini-label">Skills Known</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-num">{{ internships | length }}</div>
+            <div class="mini-label">Internships</div>
+          </div>
+        </div>
+        <div class="quick-links">
+          <a href="{{ url_for('home') }}"     class="quick-link">◈ Update Skills</a>
+          <a href="{{ url_for('roles') }}"    class="quick-link">⬡ Change Role</a>
+          <a href="{{ url_for('analysis') }}" class="quick-link">✦ Re-analyse</a>
+          <a href="{{ url_for('courses') }}"  class="quick-link">→ More Courses</a>
+        </div>
+      </div>
+
+      <!-- Resume analyser CTA -->
+      <div class="resume-cta-card">
+        <div class="resume-cta-icon">✦</div>
+        <div class="resume-cta-title">Analyse your resume</div>
+        <div class="resume-cta-sub">
+          Get AI feedback on your resume tailored to <strong>{{ role or 'your role' }}</strong>.
+        </div>
+        <a href="{{ url_for('resume_analyser') }}" class="resume-cta-btn">
+          Open Resume Analyser →
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/internship.js') }}"></script>
+{% endblock %}

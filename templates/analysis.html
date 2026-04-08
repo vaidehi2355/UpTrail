@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}UpTrail — Analysis{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analysis.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="role-tag">◈ {{ role }}</div>
+    <h1 class="page-title">Your <span class="highlight">Skill Gap Analysis</span></h1>
+    <p class="page-sub">Here's where you stand and what you need to reach internship readiness.</p>
+  </div>
+
+  <!-- Stats row -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num green">{{ readiness.completed | length }}</div>
+      <div class="stat-label">Skills Matched</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num red">{{ readiness.missing | length }}</div>
+      <div class="stat-label">Skills Missing</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num purple">{{ readiness.total_required }}</div>
+      <div class="stat-label">Total Required</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num {% if readiness.completion_pct >= 85 %}green{% elif readiness.completion_pct >= 50 %}amber{% else %}red{% endif %}">
+        {{ readiness.completion_pct }}%
+      </div>
+      <div class="stat-label">Readiness</div>
+    </div>
+  </div>
+
+  <!-- Readiness meter -->
+  <div class="readiness-card">
+    <div class="readiness-header">
+      <div>
+        <div class="readiness-title">Internship Readiness</div>
+        <div class="readiness-sub">85% needed to unlock internships</div>
+      </div>
+      <div class="readiness-pct
+        {% if readiness.completion_pct >= 85 %}pct-green
+        {% elif readiness.completion_pct >= 50 %}pct-amber
+        {% else %}pct-purple{% endif %}">
+        {{ readiness.completion_pct }}%
+      </div>
+    </div>
+
+    <div class="prog-track">
+      <div class="prog-fill
+        {% if readiness.completion_pct >= 85 %}fill-green{% endif %}"
+        data-width="{{ readiness.completion_pct }}"
+        style="width: 0%">
+      </div>
+      <!-- 85% unlock marker -->
+      <div class="unlock-marker" style="left: 85%"></div>
+    </div>
+
+    <div class="prog-labels">
+      <span>0%</span>
+      <span class="prog-current">You — {{ readiness.completion_pct }}%</span>
+      <span class="prog-unlock">85% unlock</span>
+      <span>100%</span>
+    </div>
+
+    {% if readiness.is_ready %}
+    <div class="readiness-note ready">
+      You've reached <strong>internship readiness!</strong>
+      Head straight to internships and find your match.
+    </div>
+    {% else %}
+    {% set gap = 85 - readiness.completion_pct %}
+    <div class="readiness-note">
+      You need <strong>{{ gap }}% more</strong> to unlock internships.
+      Complete the suggested courses below and verify your skills to progress.
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Skills breakdown -->
+  <div class="analysis-grid">
+
+    <!-- Completed -->
+    <div class="section-card">
+      <div class="section-title">
+        <span class="section-dot dot-green"></span>
+        Skills you have ({{ readiness.completed | length }})
+      </div>
+      {% if readiness.completed %}
+      <div class="skill-list">
+        {% for skill in readiness.completed %}
+        <div class="skill-row done">
+          <span class="skill-row-name">{{ skill }}</span>
+          <span class="skill-check">✓</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-skills">No skills matched yet — that's okay, start with courses below.</div>
+      {% endif %}
+    </div>
+
+    <!-- Missing -->
+    <div class="section-card">
+      <div class="section-title">
+        <span class="section-dot dot-red"></span>
+        Skills you need ({{ readiness.missing | length }})
+      </div>
+      {% if readiness.missing %}
+      <div class="skill-list">
+        {% for skill in readiness.missing %}
+        <div class="skill-row missing">
+          <span class="skill-row-name">{{ skill }}</span>
+          <span class="skill-x">✕</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-skills ready-text">All required skills completed!</div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Course Recommendations -->
+  <div class="section-card courses-section">
+    <div class="courses-header">
+      <div class="courses-title">✦ &nbsp;Recommended Courses for your gaps</div>
+      {% if readiness.missing and readiness.missing | length > 0 %}
+      <a href="{{ url_for('courses') }}" class="view-all-link">View all courses →</a>
+      {% endif %}
+    </div>
+
+    {% if readiness.missing and readiness.missing | length > 0 %}
+      {% if top_courses %}
+      <div class="courses-list">
+        {% for course in top_courses %}
+        <div class="course-card">
+
+          <div class="course-rank">
+            {{ loop.index }}
+          </div>
+
+          <div class="course-info">
+            <div class="course-name">{{ course.course_name }}</div>
+            <div class="course-meta">
+              {% if course.platform %}
+              <span class="platform-badge pb-{{ course.platform | lower }}">{{ course.platform }}</span>
+              {% endif %}
+              {% if course.skills_covered and course.skills_covered | string not in ('nan', 'none', '') %}
+              <span class="course-skills-hint">{{ course.skills_covered | string | truncate(60) }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="course-score">
+            {% set score_dots = (course.similarity * 5) | round | int %}
+            <div class="score-dots">
+              {% for i in range(5) %}
+              <div class="sdot {% if i < score_dots %}filled{% endif %}"></div>
+              {% endfor %}
+            </div>
+          </div>
+
+          {% if course.url %}
+          <a href="{{ course.url }}" target="_blank" class="course-link-btn">→</a>
+          {% endif %}
+
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-courses">
+        No courses found matching your skill gaps.
+      </div>
+      {% endif %}
+    {% elif readiness.completed and readiness.completed | length > 0 %}
+    <div class="empty-courses success-state">
+      <div class="success-icon">✓</div>
+      <div class="success-title">All Skills Matched!</div>
+      <div class="success-text">You have all the required skills for this role. Great job!</div>
+      <a href="{{ url_for('internship') }}" class="next-btn" style="margin-top: 1rem;">Explore Internships →</a>
+    </div>
+    {% else %}
+    <div class="empty-courses">
+      Add your skills to get personalized course recommendations.
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Next step CTA -->
+  <div class="next-step-card">
+    <div class="next-step-text">
+      <div class="next-step-label">Next Step</div>
+      {% if readiness.is_ready %}
+      <div class="next-step-title">You're internship ready! 🎉</div>
+      <div class="next-step-sub">All required skills matched — explore internships for {{ role }}.</div>
+      {% else %}
+      <div class="next-step-title">Browse the full course list</div>
+      <div class="next-step-sub">All courses ranked by relevance to your missing skills.</div>
+      {% endif %}
+    </div>
+    {% if readiness.is_ready %}
+    <a href="{{ url_for('internship') }}" class="next-btn">Go to Internships →</a>
+    {% else %}
+    <a href="{{ url_for('courses') }}" class="next-btn">Go to Courses →</a>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const COMPLETION_PCT = {{ readiness.completion_pct }};
+</script>
+<script src="{{ url_for('static', filename='js/analysis.js') }}"></script>
+{% endblock %}

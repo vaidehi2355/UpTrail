@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}UpTrail — Courses{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}?v=2">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Recommended <span class="highlight">Courses</span></h1>
+      <p class="page-sub">Ranked by relevance to your missing skills.</p>
+    </div>
+    <a href="{{ url_for('analysis') }}" class="back-btn">← Back to Analysis</a>
+  </div>
+
+  <!-- Missing skills row -->
+  {% if missing_skills %}
+  <div class="missing-row">
+    <span class="missing-label">Filling gaps in:</span>
+    {% for skill in missing_skills %}
+      <span class="missing-pill">{{ skill }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Search + platform filters -->
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" class="search-input"
+             placeholder="Search courses..." autocomplete="off">
+    </div>
+    <button class="filter-btn active" data-filter="all">All</button>
+    {% set platforms = courses | map(attribute='platform') | unique | list %}
+    {% for platform in platforms %}
+      {% if platform %}
+      <button class="filter-btn" data-filter="{{ platform }}">{{ platform }}</button>
+      {% endif %}
+    {% endfor %}
+    <span class="count" id="countLabel">{{ courses | length }} courses</span>
+  </div>
+
+  <!-- Courses grid -->
+  {% if courses %}
+    {% if missing_skills %}
+    <!-- Personalized view with relevance ranking -->
+    <div class="courses-grid" id="coursesGrid">
+      {% for course in courses %}
+      <div class="course-card"
+           data-platform="{{ course.platform or 'Other' }}"
+           data-name="{{ course.course_name | lower }}">
+
+        <div class="card-top">
+          <div class="rank-badge rank-num">
+            {{ loop.index }}
+          </div>
+          <span class="platform-badge pb-{{ (course.platform or 'other') | lower }}">
+            {{ course.platform or 'Other' }}
+          </span>
+        </div>
+
+        <div class="course-name">{{ course.course_name }}</div>
+
+        {% if course.description %}
+        <div class="course-desc">{{ course.description[:120] }}{% if course.description | length > 120 %}…{% endif %}</div>
+        {% endif %}
+
+        <!-- Skills covered as tags -->
+        {% if course.skills_list %}
+        <div class="skills-covered">
+          {% for skill in course.skills_list[:4] %}
+            <span class="skill-tag-sm {% if skill.strip().lower() in missing_skills %}match{% endif %}">
+              {{ skill.strip() }}
+            </span>
+          {% endfor %}
+          {% if course.skills_list | length > 4 %}
+            <span class="skill-tag-sm more">+{{ course.skills_list | length - 4 }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Relevance dots -->
+        <div class="relevance-row">
+          <span class="relevance-label">Relevance</span>
+          <div class="score-dots">
+            {% set dots = (course.similarity * 5) | round | int %}
+            {% for i in range(5) %}
+              <div class="sdot {% if i < dots %}filled{% endif %}"></div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="card-actions">
+          {% if course.url %}
+            <a href="{{ course.url }}" target="_blank" class="view-btn">View Course →</a>
+          {% else %}
+            <span class="view-btn no-url">No link available</span>
+          {% endif %}
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- All courses view grouped by platform -->
+    {% set grouped_courses = courses | groupby('platform') %}
+    {% for platform, course_list in grouped_courses %}
+    <div class="platform-section" data-platform="{{ platform or 'Other' }}">
+      <h2 class="platform-heading">{{ platform or 'Other' }} <span class="platform-count">({{ course_list | length }})</span></h2>
+      <div class="courses-grid">
+        {% for course in course_list %}
+        <div class="course-card"
+             data-platform="{{ course.platform or 'Other' }}"
+             data-name="{{ course.course_name | lower }}">
+
+          <div class="card-top">
+            <span class="platform-badge pb-{{ (course.platform or 'other') | lower }}">
+              {{ course.platform or 'Other' }}
+            </span>
+          </div>
+
+          <div class="course-name">{{ course.course_name }}</div>
+
+          {% if course.description %}
+          <div class="course-desc">{{ course.description[:120] }}{% if course.description | length > 120 %}…{% endif %}</div>
+          {% endif %}
+
+          <!-- Skills covered as tags -->
+          {% if course.skills_list %}
+          <div class="skills-covered">
+            {% for skill in course.skills_list[:4] %}
+              <span class="skill-tag-sm">
+                {{ skill.strip() }}
+              </span>
+            {% endfor %}
+            {% if course.skills_list | length > 4 %}
+              <span class="skill-tag-sm more">+{{ course.skills_list | length - 4 }}</span>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <div class="card-actions">
+            {% if course.url %}
+              <a href="{{ course.url }}" target="_blank" class="view-btn">View Course →</a>
+            {% else %}
+              <span class="view-btn no-url">No link available</span>
+            {% endif %}
+          </div>
+
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+  {% else %}
+  <!-- Empty state -->
+  <div class="empty-state">
+    <div class="empty-state-icon">◎</div>
+    <div class="empty-state-text">
+      No courses found.<br>
+      Make sure <code>data/courses.csv</code> exists and has a <code>skills_covered</code> column.
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Next step CTA -->
+  <div class="next-step-card">
+    <div class="next-step-text">
+      <div class="next-step-label">Next Step</div>
+      <div class="next-step-title">Done exploring courses?</div>
+      <div class="next-step-sub">Head to internships matched for {{ role or 'your role' }}.</div>
+    </div>
+    <a href="{{ url_for('internship') }}" class="next-btn">Go to Internships →</a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const MISSING_SKILLS = {{ missing_skills | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/courses.js') }}"></script>
+{% endblock %}

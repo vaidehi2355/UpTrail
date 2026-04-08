@@ -1,0 +1,386 @@
+/* ── UpTrail — home.css ──────────────────────────────────────────────────── */
+
+/* ── "Starting fresh" banner ─────────────────────────────────────────────── */
+.fresh-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background: linear-gradient(135deg, rgba(109,40,217,0.12), rgba(192,132,252,0.08));
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1.2rem;
+  animation: fadeUp 0.4s ease both;
+}
+
+.fresh-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fresh-icon {
+  font-size: 1.5rem;
+  color: var(--purple-lt);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.fresh-title {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.fresh-desc {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.fresh-btn {
+  flex-shrink: 0;
+  padding: 9px 20px;
+  background: linear-gradient(135deg, var(--purple-dk), var(--purple));
+  color: #fff;
+  border-radius: var(--radius);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 0 18px var(--glow);
+  transition: all var(--transition);
+}
+.fresh-btn:hover {
+  box-shadow: 0 0 28px rgba(138,92,246,0.45);
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.fresh-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.42s ease both;
+}
+.fresh-divider::before,
+.fresh-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.fresh-divider span {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.page-header {
+  margin-bottom: 2rem;
+  animation: fadeUp 0.4s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Two-column layout ───────────────────────────────────────────────────── */
+.home-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ── Skills panel (left) ─────────────────────────────────────────────────── */
+.skills-panel { animation: fadeUp 0.45s ease both; }
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+}
+
+.card-title {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.skill-total-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-3);
+  background: var(--surface2);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+/* Search bar */
+.search-wrap {
+  position: relative;
+  margin-bottom: 1.4rem;
+}
+
+.search-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 36px 11px 38px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.search-input:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(138,92,246,0.1);
+}
+
+.search-input::placeholder { color: var(--text-3); }
+
+.search-clear {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px;
+  display: none;
+  transition: color var(--transition);
+}
+.search-clear:hover { color: var(--text-2); }
+.search-clear.visible { display: block; }
+
+/* Domain sections */
+.domain-section {
+  margin-bottom: 1.4rem;
+  transition: opacity var(--transition);
+}
+
+.domain-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.domain-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+/* Skill chip */
+.skill-chip {
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 0.77rem;
+  font-weight: 500;
+  background: var(--bg3);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+}
+
+.skill-chip:hover {
+  border-color: var(--border2);
+  color: var(--text);
+  background: var(--surface2);
+}
+
+.skill-chip.selected {
+  background: rgba(138, 92, 246, 0.14);
+  color: var(--purple-lt);
+  border-color: var(--border2);
+}
+
+.skill-chip.hidden { display: none; }
+
+/* No results */
+.no-results {
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+.no-results-text {
+  font-size: 0.85rem;
+  color: var(--text-3);
+  line-height: 1.6;
+}
+
+/* ── Sidebar (right) ─────────────────────────────────────────────────────── */
+.sidebar { animation: fadeUp 0.5s ease both; }
+
+.sidebar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  position: sticky;
+  top: 74px;
+}
+
+.selected-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.selected-title {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.selected-count {
+  background: rgba(138, 92, 246, 0.15);
+  color: var(--purple-lt);
+  border: 1px solid var(--border2);
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  min-width: 28px;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+/* Selected tags area */
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 68px;
+  margin-bottom: 1.2rem;
+}
+
+.sel-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(138, 92, 246, 0.12);
+  color: var(--purple-lt);
+  border: 1px solid var(--border2);
+  animation: popIn 0.18s ease both;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.sel-tag-rm {
+  cursor: pointer;
+  color: var(--text-3);
+  font-size: 0.68rem;
+  margin-left: 2px;
+  transition: color var(--transition);
+  line-height: 1;
+}
+.sel-tag-rm:hover { color: var(--danger); }
+
+.empty-sel {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  text-align: center;
+  width: 100%;
+  padding: 1.2rem 0;
+  line-height: 1.7;
+}
+
+/* Proceed button */
+.proceed-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--purple-dk), var(--purple));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 20px var(--glow);
+  margin-top: 1rem;
+  transition: all var(--transition);
+  letter-spacing: 0.01em;
+}
+
+.proceed-btn:hover:not(:disabled) {
+  box-shadow: 0 0 32px rgba(138,92,246,0.45);
+  transform: translateY(-2px);
+}
+
+.proceed-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.proceed-hint {
+  text-align: center;
+  font-size: 0.74rem;
+  color: var(--text-3);
+  margin-top: 8px;
+  min-height: 18px;
+  transition: color var(--transition);
+}
+.proceed-hint.ready { color: var(--success); }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .home-layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-card { position: static; }
+}

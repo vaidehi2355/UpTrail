@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}UpTrail — Resume Analyser{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/resume_analyser.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-icon">✦</div>
+    <h1 class="page-title">AI <span class="highlight">Resume Analyser</span></h1>
+    <p class="page-sub">Upload your resume and get instant AI feedback tailored to your chosen role.</p>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- ── Left: Upload form ───────────────────────────────────────────────── -->
+    <div class="upload-col">
+      <div class="upload-card">
+        <div class="upload-title">Upload Resume</div>
+
+        <form method="POST" action="{{ url_for('resume_analyser') }}"
+              enctype="multipart/form-data" id="resumeForm">
+
+          <!-- Drop zone -->
+          <div class="drop-zone" id="dropZone"
+               onclick="document.getElementById('fileInput').click()">
+            <div class="drop-icon">⬡</div>
+            <div class="drop-text">Drop your resume here</div>
+            <div class="drop-sub">PDF, PNG or JPG · or <span class="browse-link">browse files</span></div>
+          </div>
+
+          <!-- File selected state -->
+          <div class="file-selected" id="fileSelected" style="display:none;">
+            <span class="file-icon">✓</span>
+            <span class="file-name" id="fileName"></span>
+            <span class="file-remove" onclick="clearFile()">✕</span>
+          </div>
+
+          <!-- Hidden file input -->
+          <input type="file" id="fileInput" name="resume"
+                 accept=".pdf,.png,.jpg,.jpeg"
+                 style="display:none;" onchange="handleFileSelect(this)">
+
+          <!-- Role selector -->
+          <div class="form-group">
+            <label class="form-label">Analyse for role</label>
+            <select name="role_override" class="form-select" id="roleSelect">
+              <option value="{{ session.get('selected_role', '') }}">
+                {% if session.get('selected_role') %}
+                  {{ session.get('selected_role') }} (current)
+                {% else %}
+                  — select a role —
+                {% endif %}
+              </option>
+              {% for role in roles %}
+                {% if role != session.get('selected_role') %}
+                <option value="{{ role }}">{{ role }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <button type="submit" class="analyse-btn" id="analyseBtn" disabled>
+            ✦ Analyse Resume
+          </button>
+
+        </form>
+
+        <!-- Tips -->
+        <div class="tips-card">
+          <div class="tips-title">Tips for best results</div>
+          <div class="tip-row"><span class="tip-dot">◈</span>Use a single-page PDF resume</div>
+          <div class="tip-row"><span class="tip-dot">◈</span>Include a clear skills section</div>
+          <div class="tip-row"><span class="tip-dot">◈</span>Add project descriptions with outcomes</div>
+          <div class="tip-row"><span class="tip-dot">◈</span>Select the role you're applying for</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Right: Results ─────────────────────────────────────────────────── -->
+    <div class="results-col">
+      <div class="results-card">
+        <div class="results-header">
+          <div class="results-title">Analysis Results</div>
+          <div class="ai-badge">✦ AI Powered</div>
+        </div>
+
+        {% if result %}
+
+          <!-- Score -->
+          <div class="score-section">
+            <div class="score-num" id="scoreNum">{{ result.score or '—' }}</div>
+            <div class="score-label">Resume Score</div>
+            {% if result.score %}
+            <div class="score-sub">
+              {% if result.score >= 80 %}Excellent — this resume stands out!
+              {% elif result.score >= 60 %}Good — a few improvements can make this stand out
+              {% else %}Needs work — follow the suggestions below
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- File analysed -->
+          <div class="analysed-file">
+            <span class="af-icon">✓</span>
+            <span class="af-name">{{ result.filename }}</span>
+            <span class="af-role">for {{ result.role or 'General' }}</span>
+          </div>
+
+          <!-- Summary -->
+          {% if result.summary %}
+          <div class="section-block">
+            <div class="block-title"><span class="block-dot dot-purple"></span>Summary</div>
+            <div class="summary-text">{{ result.summary }}</div>
+          </div>
+          {% endif %}
+
+          <!-- Strengths -->
+          {% if result.strengths %}
+          <div class="section-block">
+            <div class="block-title"><span class="block-dot dot-green"></span>Strengths</div>
+            {% for item in result.strengths %}
+            <div class="result-item strength">
+              <span class="ri-icon green">✓</span>{{ item }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Improvements -->
+          {% if result.improvements %}
+          <div class="section-block">
+            <div class="block-title"><span class="block-dot dot-amber"></span>Improvements</div>
+            {% for item in result.improvements %}
+            <div class="result-item improve">
+              <span class="ri-icon amber">!</span>{{ item }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Skills found -->
+          {% if result.skills_found %}
+          <div class="section-block">
+            <div class="block-title"><span class="block-dot dot-purple"></span>Skills found in resume</div>
+            <div class="skills-match">
+              {% for skill in result.skills_found %}
+              <span class="sm-pill {% if skill in result.skills_matched %}sm-yes{% else %}sm-other{% endif %}">
+                {{ skill }}
+              </span>
+              {% endfor %}
+              {% for skill in result.skills_missing %}
+              <span class="sm-pill sm-no">{{ skill }}</span>
+              {% endfor %}
+            </div>
+            <div class="skills-legend">
+              <span class="legend-item"><span class="sm-pill sm-yes">green</span> = in resume & required</span>
+              <span class="legend-item"><span class="sm-pill sm-no">red</span> = required but missing</span>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- AI Suggestions -->
+          {% if result.suggestions %}
+          <div class="section-block">
+            <div class="block-title"><span class="block-dot dot-purple"></span>AI Suggestions</div>
+            {% for item in result.suggestions %}
+            <div class="result-item suggest">
+              <span class="ri-icon purple">→</span>{{ item }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+        {% else %}
+
+          <!-- Empty / placeholder state -->
+          <div class="empty-results">
+            <div class="empty-icon">✦</div>
+            <div class="empty-title">No analysis yet</div>
+            <div class="empty-text">
+              Upload your resume on the left and click<br>
+              <strong>Analyse Resume</strong> to get started.
+            </div>
+            <div class="placeholder-blocks">
+              <div class="placeholder-block"></div>
+              <div class="placeholder-block short"></div>
+              <div class="placeholder-block"></div>
+              <div class="placeholder-block short"></div>
+            </div>
+          </div>
+
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const ROLES = {{ roles | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/resume_analyser.js') }}"></script>
+{% endblock %}

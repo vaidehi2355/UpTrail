@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}UpTrail — Explore Roles{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/roles.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Explore <span class="highlight">Career Roles</span></h1>
+      <p class="page-sub">
+        {% if explore_mode %}
+          Browse all available roles and pick one that interests you.
+        {% else %}
+          Roles are ranked by how well your skills match. Click any to dive into analysis.
+        {% endif %}
+      </p>
+    </div>
+    <a href="{{ url_for('home') }}" class="back-btn">← Update Skills</a>
+  </div>
+
+  <!-- Explore mode banner -->
+  {% if explore_mode or not user_skills %}
+  <div class="explore-banner">
+    <span class="explore-banner-icon">◎</span>
+    <span>
+      You're in <strong>explore mode</strong> — all roles are shown.
+      Select one to see your full learning path and what skills you'd need.
+    </span>
+  </div>
+  {% endif %}
+
+  <!-- Filters + count -->
+  <div class="filters-row">
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">All Roles</button>
+      <button class="filter-btn" data-filter="high">Strong Match</button>
+      <button class="filter-btn" data-filter="mid">Partial Match</button>
+      <button class="filter-btn" data-filter="low">Explore New</button>
+    </div>
+    <span class="results-count" id="resultsCount">{{ roles | length }} roles</span>
+  </div>
+
+  <!-- Roles grid -->
+  {% if roles %}
+  <div class="roles-grid" id="rolesGrid">
+    {% for role in roles %}
+    {% set pct = role.match_pct %}
+    {% set is_top = loop.first and pct > 0 %}
+
+    <div class="role-card {% if is_top %}top-match{% endif %}"
+         data-pct="{{ pct }}"
+         data-role="{{ role.role_name }}">
+
+      {% if is_top %}
+      <div class="top-label">Top Match</div>
+      {% endif %}
+
+      <div class="card-top">
+        <div class="role-icon {{ loop.cycle('purple','teal','blue','amber','coral') }}">
+          {{ loop.cycle('⬡','◈','✦','◎','→') }}
+        </div>
+        {% if pct >= 60 %}
+          <span class="match-badge match-high">{{ pct }}% match</span>
+        {% elif pct >= 20 %}
+          <span class="match-badge match-mid">{{ pct }}% match</span>
+        {% elif pct > 0 %}
+          <span class="match-badge match-low">{{ pct }}% match</span>
+        {% else %}
+          <span class="match-badge match-zero">Explore</span>
+        {% endif %}
+      </div>
+
+      <div class="role-name">{{ role.role_name }}</div>
+      <div class="role-desc">{{ role.description or 'Explore this role and build the skills needed to get started.' }}</div>
+
+      <!-- Progress bar -->
+      <div class="progress-row">
+        <div class="progress-label">
+          <span>Skills matched</span>
+          <span>{{ role.matched_skills | length }} / {{ role.total_required if role.total_required is defined else (role.matched_skills | length + role.missing_skills | length) }}</span>
+        </div>
+        <div class="prog-track">
+          <div class="prog-fill {% if pct >= 60 %}high{% elif pct == 0 %}zero{% endif %}"
+               style="width: {{ pct }}%"></div>
+        </div>
+      </div>
+
+      <!-- Skill pills: show up to 3 matched, 2 missing, then +N more -->
+      <div class="skill-preview">
+        {% for skill in role.matched_skills[:3] %}
+          <span class="skill-pill matched">{{ skill }}</span>
+        {% endfor %}
+        {% set missing_display_count = [role.missing_skills | length, 2] | min %}
+        {% for skill in role.missing_skills[:missing_display_count] %}
+          <span class="skill-pill missing">{{ skill }}</span>
+        {% endfor %}
+        {% set remaining = (role.missing_skills | length) - missing_display_count %}
+        {% if remaining > 0 %}
+          <span class="skill-pill more">+{{ remaining }} more</span>
+        {% endif %}
+      </div>
+
+      <a href="{{ url_for('select_role', role_name=role.role_name) }}"
+         class="select-role-btn">Choose This Role →</a>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Empty state -->
+  <div class="empty-state">
+    <div class="empty-state-icon">◎</div>
+    <div class="empty-state-text">
+      No roles found.<br>
+      Make sure your <code>roles.csv</code> is in the <code>data/</code> folder.
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const EXPLORE_MODE = {{ 'true' if (explore_mode or not user_skills) else 'false' }};
+</script>
+<script src="{{ url_for('static', filename='js/roles.js') }}"></script>
+{% endblock %}

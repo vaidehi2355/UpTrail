@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}UpTrail{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if session.get('user') %}
+<nav class="navbar">
+
+  <a href="{{ url_for('home') }}" class="navbar-logo">
+    <div class="logo-icon">U</div>
+    Up<span class="accent">Trail</span>
+  </a>
+
+  <div class="navbar-progress">
+    {% set steps = [
+      ('Skills',       'home'),
+      ('Roles',        'roles'),
+      ('Analysis',     'analysis'),
+      ('Courses',      'courses'),
+      ('Internship',   'internship')
+    ] %}
+    {% for label, endpoint in steps %}
+      {% if not loop.first %}<span class="progress-arrow">›</span>{% endif %}
+      <a href="{{ url_for(endpoint) }}"
+         class="progress-step {% if request.endpoint == endpoint %}active{% endif %}">
+        <span class="dot"></span>{{ label }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="navbar-right">
+    <a href="{{ url_for('resume_analyser') }}" class="nav-btn nav-btn-purple">
+      ✦ Resume Analyser
+    </a>
+    <div class="nav-profile">
+      <div class="nav-avatar">{{ session.get('user', 'U')[0].upper() }}</div>
+      <div class="nav-profile-dropdown">
+        <div class="dropdown-user">
+          <div class="dropdown-user-name">{{ session.get('user') }}</div>
+          <div class="dropdown-user-role">Student</div>
+        </div>
+        <a href="{{ url_for('internship') }}" class="dropdown-item">⬡ &nbsp;Dashboard</a>
+        <a href="#"                           class="dropdown-item">◈ &nbsp;Profile</a>
+        <a href="{{ url_for('resume_analyser') }}" class="dropdown-item">✦ &nbsp;Resume Analyser</a>
+        <div class="dropdown-divider"></div>
+        <a href="{{ url_for('logout') }}" class="dropdown-item danger">→ &nbsp;Logout</a>
+      </div>
+    </div>
+  </div>
+
+</nav>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-wrap">
+    {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<main class="main-wrap">
+  {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='js/base.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

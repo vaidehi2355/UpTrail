@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}UpTrail — Skills Input{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1 class="page-title">What are your <span class="highlight">current skills?</span></h1>
+    <p class="page-sub">Select skills you already know — or skip this and explore roles directly.</p>
+  </div>
+
+  <!-- ── Starting fresh banner ──────────────────────────────────────────── -->
+  <div class="fresh-banner">
+    <div class="fresh-left">
+      <span class="fresh-icon">◎</span>
+      <div>
+        <div class="fresh-title">New here? No skills yet?</div>
+        <div class="fresh-desc">That's completely fine — explore all roles first and see what excites you.</div>
+      </div>
+    </div>
+    <a href="{{ url_for('roles') }}?explore=1" class="fresh-btn">Explore All Roles →</a>
+  </div>
+
+  <div class="fresh-divider">
+    <span>or select the skills you already know</span>
+  </div>
+
+  <form method="POST" action="{{ url_for('home') }}" id="skillsForm">
+
+    <div class="home-layout">
+
+      <!-- ── Left: Skill browser ─────────────────────────────────────────── -->
+      <div class="skills-panel">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Browse skills by domain</span>
+            <span class="skill-total-badge">{{ all_skills | length }} skills</span>
+          </div>
+
+          <!-- Search -->
+          <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="searchInput" class="search-input"
+                   placeholder="Search for a skill..." autocomplete="off">
+            <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+          </div>
+
+          <!-- Domain sections rendered from JSON -->
+          <div id="skillsContainer">
+            {% for domain, skills in skills_data.items() %}
+            <div class="domain-section" data-domain="{{ domain }}">
+              <div class="domain-label">{{ domain }}</div>
+              <div class="skills-grid">
+                {% for skill in skills %}
+                <span class="skill-chip {% if skill in user_skills %}selected{% endif %}"
+                      data-skill="{{ skill }}"
+                      onclick="toggleSkill(this)">
+                  {{ skill }}
+                </span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- No results -->
+          <div class="no-results" id="noResults" style="display:none;">
+            <div class="no-results-text">No skills match "<span id="noResultsQuery"></span>"</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Right: Sidebar ─────────────────────────────────────────────── -->
+      <div class="sidebar">
+        <div class="sidebar-card">
+
+          <!-- Selected skills -->
+          <div class="selected-header">
+            <span class="selected-title">Selected Skills</span>
+            <span class="selected-count" id="countBadge">{{ user_skills | length }}</span>
+          </div>
+
+          <div class="selected-tags" id="selectedTags">
+            {% if not user_skills %}
+            <div class="empty-sel" id="emptyMsg">
+              Click skills on the left<br>to add them here.
+            </div>
+            {% else %}
+            {% for skill in user_skills %}
+            <span class="sel-tag" data-skill="{{ skill }}">
+              {{ skill }}
+              <span class="sel-tag-rm" onclick="removeTag('{{ skill }}')">✕</span>
+            </span>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Role selector -->
+          <label class="form-label">Target Role</label>
+          <select name="role" class="form-select" id="roleSelect">
+            <option value="">— choose a role —</option>
+            {% for role in roles %}
+            <option value="{{ role }}"
+              {% if role == selected_role %}selected{% endif %}>
+              {{ role }}
+            </option>
+            {% endfor %}
+          </select>
+
+          <!-- Hidden inputs for selected skills -->
+          <div id="hiddenInputs">
+            {% for skill in user_skills %}
+            <input type="hidden" name="skills" value="{{ skill }}">
+            {% endfor %}
+          </div>
+
+          <button type="submit" class="proceed-btn" id="proceedBtn">
+            Find Matching Roles →
+          </button>
+
+          <div class="proceed-hint" id="proceedHint">
+            {% if user_skills | length == 0 %}
+            No skills selected — we'll show all roles
+            {% else %}
+            {{ user_skills | length }} skill{{ 's' if user_skills | length != 1 }} selected — good to go!
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Pass skills data from Flask to JS -->
+<script>
+  const SKILLS_DATA   = {{ skills_data | tojson }};
+  const INITIAL_SKILLS = {{ user_skills | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+{% endblock %}

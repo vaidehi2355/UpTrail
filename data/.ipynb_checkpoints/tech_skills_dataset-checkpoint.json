@@ -1,0 +1,57 @@
+{
+  "Programming Languages": [
+    "Python", "JavaScript", "Java", "C", "C++", "C#", "TypeScript", "Go", "Rust",
+    "Ruby", "Swift", "Kotlin", "PHP", "Scala", "R", "MATLAB", "Dart", "Lua",
+    "Perl", "Haskell", "Elixir", "Solidity", "Shell Scripting", "Bash", "Assembly"
+  ],
+  "Frontend Development": [
+    "HTML", "CSS", "React", "Vue.js", "Angular", "Next.js", "Nuxt.js", "Svelte",
+    "Tailwind CSS", "Bootstrap", "SASS/SCSS", "jQuery", "Redux", "Webpack",
+    "Vite", "GraphQL (Client)", "WebSockets", "Three.js", "D3.js", "Figma",
+    "Storybook", "Jest", "Cypress", "Accessibility (WCAG)", "Web Performance"
+  ],
+  "Backend Development": [
+    "Node.js", "Express.js", "Django", "Flask", "FastAPI", "Spring Boot",
+    "Laravel", "Ruby on Rails", "ASP.NET", "NestJS", "GraphQL (Server)",
+    "REST API Design", "gRPC", "WebSockets", "OAuth 2.0", "JWT", "Nginx",
+    "Apache", "Celery", "RabbitMQ", "Redis", "Elasticsearch", "Kafka",
+    "Microservices", "OpenAPI / Swagger"
+  ],
+  "Data Science & AI": [
+    "Pandas", "NumPy", "Scikit-learn", "TensorFlow", "PyTorch", "Keras",
+    "Hugging Face", "LangChain", "OpenCV", "NLTK", "spaCy", "Matplotlib",
+    "Seaborn", "Plotly", "XGBoost", "LightGBM", "Statsmodels", "Jupyter",
+    "Apache Spark", "MLflow", "Weights & Biases", "CUDA", "Prompt Engineering",
+    "Feature Engineering", "A/B Testing", "Data Visualization", "Time Series Analysis",
+    "Reinforcement Learning", "Computer Vision"
+  ],
+  "Databases": [
+    "SQL", "PostgreSQL", "MySQL", "SQLite", "Microsoft SQL Server", "Oracle DB",
+    "MongoDB", "Redis", "Cassandra", "DynamoDB", "Firebase", "Elasticsearch",
+    "Neo4j", "InfluxDB", "Supabase", "PlanetScale", "Prisma ORM",
+    "Sequelize", "Database Indexing", "Query Optimization",
+    "Data Modeling", "Database Replication", "Stored Procedures"
+  ],
+  "Cloud & DevOps": [
+    "AWS", "Google Cloud Platform", "Microsoft Azure", "Docker", "Kubernetes",
+    "Terraform", "Ansible", "Helm", "Jenkins", "GitHub Actions", "GitLab CI",
+    "CircleCI", "Prometheus", "Grafana", "ELK Stack", "Linux", "Bash Scripting",
+    "Nginx", "Load Balancing", "Auto Scaling", "Serverless", "CDN",
+    "Infrastructure as Code", "Site Reliability Engineering", "Chaos Engineering"
+  ],
+  "Cybersecurity": [
+    "Network Security", "Penetration Testing", "Burp Suite", "Metasploit",
+    "Wireshark", "Nmap", "OWASP Top 10", "Cryptography", "TLS/SSL",
+    "IAM", "Zero Trust Security", "SIEM", "Incident Response", "Threat Modeling",
+    "Kali Linux", "Digital Forensics", "Reverse Engineering", "Malware Analysis",
+    "OSINT", "Vulnerability Assessment", "Firewall Configuration", "DevSecOps",
+    "SOC Operations", "Compliance (ISO 27001 / NIST)"
+  ],
+  "Tools & Technologies": [
+    "Git", "GitHub", "GitLab", "Bitbucket", "JIRA", "Confluence", "Postman",
+    "VS Code", "IntelliJ IDEA", "Xcode", "Android Studio", "Figma", "Notion",
+    "Slack API", "Webhooks", "WebAssembly", "Blockchain", "MQTT", "ROS",
+    "Arduino", "Raspberry Pi", "Unity", "Unreal Engine", "Vim/Neovim",
+    "Make / CMake", "npm / yarn / pnpm", "Homebrew"
+  ]
+}
