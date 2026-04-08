@@ -11,18 +11,26 @@ import numpy as np
 import google.generativeai as genai
 import pdfplumber
 
-load_dotenv(dotenv_path=".env")
+# Load environment variables (works locally, skipped in production)
+load_dotenv(dotenv_path=".env", quiet=True)
+
 # Configure Gemini
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-gemini_model = genai.GenerativeModel("models/gemini-flash-latest")
-
-
-import google.generativeai as genai
+GEMINI_KEY = os.getenv("GEMINI_API_KEY")
+if GEMINI_KEY:
+    genai.configure(api_key=GEMINI_KEY)
+    gemini_model = genai.GenerativeModel("models/gemini-flash-latest")
+else:
+    gemini_model = None
 
 # ─── App Setup ───────────────────────────────────────────────────────────────
 
 app = Flask(__name__)
 app.secret_key = "uptrail_secret_key_change_in_production"
+
+# Log startup for debugging
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 ALLOWED_EXTENSIONS = {"pdf" , "png", "jpg", "jpeg"}
@@ -182,7 +190,16 @@ google = oauth.register(
     }
 )
 
+logger.info("UpTrail app initialized successfully")
+logger.info("Google OAuth configured: %s", "Yes" if os.getenv("GOOGLE_CLIENT_ID") else "No")
+logger.info("Gemini configured: %s", "Yes" if gemini_model else "No")
+
 # ─── Routes ───────────────────────────────────────────────────────────────────
+
+@app.route("/health")
+def health():
+    """Health check endpoint for Render."""
+    return {"status": "healthy"}, 200
 
 # Dashboard
 # @app.route("/dashboard")
@@ -651,5 +668,9 @@ def resume_analyser():
 
 # ─── Run ──────────────────────────────────────────────────────────────────────
 
+logger.info("All routes registered successfully")
+
 if __name__ == "__main__":
-    app.run()
+    port = int(os.getenv("PORT", 5000))
+    logger.info(f"Starting development server on port {port}")
+    app.run(host="0.0.0.0", port=port, debug=True)
