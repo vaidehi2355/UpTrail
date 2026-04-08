@@ -12,7 +12,7 @@ import google.generativeai as genai
 import pdfplumber
 
 # Load environment variables (works locally, skipped in production)
-load_dotenv(dotenv_path=".env", quiet=True)
+load_dotenv(dotenv_path=".env")
 
 # Configure Gemini
 GEMINI_KEY = os.getenv("GEMINI_API_KEY")
